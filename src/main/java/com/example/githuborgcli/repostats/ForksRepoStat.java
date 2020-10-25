@@ -3,9 +3,13 @@ package com.example.githuborgcli.repostats;
 import com.example.githuborgcli.IRepoStat;
 import com.example.githuborgcli.Repository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public class ForksRepoStat implements IRepoStat {
+
+    List<String> stats;
 
     public ForksRepoStat() {
         this.stats = new ArrayList<>();
@@ -20,8 +24,6 @@ public class ForksRepoStat implements IRepoStat {
     public List<String> getStats() {
         return stats;
     }
-
-    List<String> stats;
 
     @Override
     public void generateStats(List<Repository> repositories, int count) {

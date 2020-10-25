@@ -10,5 +10,4 @@ class Constants {
 
     static String OUTPUT_FILE = "output_file";
 
-
 }

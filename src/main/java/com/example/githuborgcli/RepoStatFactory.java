@@ -7,7 +7,7 @@ import com.example.githuborgcli.repostats.StarsRepoStat;
 
 class RepoStatFactory {
 
-     IRepoStat getRepoStat(RepoStatType repoStatType) {
+    IRepoStat getRepoStat(RepoStatType repoStatType) {
         if (repoStatType == null)
             return null;
 

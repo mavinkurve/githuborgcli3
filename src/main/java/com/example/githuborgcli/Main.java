@@ -1,11 +1,11 @@
 package com.example.githuborgcli;
 
+import me.tongfei.progressbar.ProgressBar;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.kohsuke.github.GHOrganization;
 import org.kohsuke.github.GitHub;
-import org.kohsuke.github.GitHubBuilder;
 import picocli.CommandLine;
 
 import java.util.ArrayList;
@@ -33,26 +33,37 @@ public class Main implements Callable<Integer> {
     @CommandLine.Option(names = {"-p", "--password"}, description = "GitHub password", arity = "0..1", interactive = true)
     private char[] password = null;
 
+    public static void main(String[] args) {
+        System.out.println(log.getName());
+
+        int exitCode = new CommandLine(new Main()).execute(args);
+        System.exit(exitCode);
+    }
+
     public Integer call() throws Exception {
         StopWatch watch = new StopWatch();
         watch.start();
-
-        byte[] bytes = new byte[password.length];
-        for (int i = 0; i < bytes.length; i++) { bytes[i] = (byte) password[i]; }
 
         log.info("Getting stats on " + this.orgName + " for n: " + count);
 
         GitHub client = GithubClient.getClient(accessToken, username, password);
 
-        if (client == null){
+        if (client == null) {
             return -1;
         }
 
         GHOrganization organization = client.getOrganization(orgName);
         List<Repository> repositories = new ArrayList<>();
-        organization.getRepositories().values().parallelStream().forEach(r -> repositories.add(new Repository(r)));
+        ProgressBar pb = new ProgressBar("Gather repository information", organization.getRepositories().size()).start(); // name, initial max
 
-        log.debug("Gathered {} repositories",repositories.size());
+        organization.getRepositories().values().parallelStream().forEach(r -> {
+            repositories.add(new Repository(r));
+            pb.step(); // step by 1
+        });
+
+        pb.stop(); // stops the progress bar
+
+        log.debug("Gathered {} repositories", repositories.size());
 
         log.debug("Initializing stat factory");
         RepoStatFactory statFactory = new RepoStatFactory();
@@ -63,18 +74,12 @@ public class Main implements Callable<Integer> {
         }
         repoStats.forEach(rs -> rs.generateStats(repositories, count));
 
-        RepoStatReport.generate(repoStats,orgName);
+        RepoStatReport.generate(repoStats, orgName);
 
         watch.stop();
         long result = watch.getTime(TimeUnit.SECONDS);
         log.info("Total time for execution: {} seconds", result);
 
         return 0;
-    }
-    public static void main(String[] args) {
-        System.out.println(log.getName());
-
-        int exitCode = new CommandLine(new Main()).execute(args);
-        System.exit(exitCode);
     }
 }

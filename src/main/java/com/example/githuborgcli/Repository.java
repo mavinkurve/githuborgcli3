@@ -9,6 +9,11 @@ import java.io.IOException;
 
 public class Repository {
 
+    static Logger log = (Logger) LogManager.getLogger();
+    int pullRequestCount;
+    Double contribution;
+    private GHRepository ghRepository;
+
     public Repository(GHRepository ghRepo) {
 
         ghRepository = ghRepo;
@@ -20,10 +25,8 @@ public class Repository {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        contribution = (pullRequestCount > 0.0) ?  pullRequestCount / forks :  0.0;
+        contribution = (pullRequestCount > 0.0) ? pullRequestCount / forks : 0.0;
     }
-
-    static Logger log = (Logger) LogManager.getLogger();
 
     public Double getStars() {
         return (double) ghRepository.getStargazersCount();
@@ -37,9 +40,6 @@ public class Repository {
         return contribution;
     }
 
-    int pullRequestCount;
-    Double contribution;
-
     public String getName() {
         return ghRepository.getName();
     }
@@ -47,7 +47,5 @@ public class Repository {
     public int getForks() {
         return ghRepository.getForksCount();
     }
-
-    private GHRepository ghRepository;
 
 }

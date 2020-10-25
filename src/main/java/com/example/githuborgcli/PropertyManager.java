@@ -3,8 +3,6 @@ package com.example.githuborgcli;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -26,10 +24,6 @@ public class PropertyManager {
         }
     }
 
-    public static PropertyManager getInstance() {
-        return ourInstance;
-    }
-
     private PropertyManager() throws IOException {
         try (InputStream input = PropertyManager.class.getClassLoader().getResourceAsStream("config.properties")) {
             properties = new Properties();
@@ -42,6 +36,10 @@ public class PropertyManager {
             properties.load(input);
 
         }
+    }
+
+    public static PropertyManager getInstance() {
+        return ourInstance;
     }
 
     static String get(String key) {
