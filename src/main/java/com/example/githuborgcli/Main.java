@@ -6,13 +6,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHOrganization;
+import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 import picocli.CommandLine;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @CommandLine.Command(name = "getRepoStats", mixinStandardHelpOptions = true, version = "version 1.0",
@@ -47,33 +48,10 @@ public class Main implements Callable<Integer> {
 
         log.info("Getting stats on " + this.orgName + " for n: " + count);
 
-        GitHub client = GithubClient.getClient(group, password);
+        GithubClient client = new GithubClient(group, password);
 
-        if (client == null) {
-            return -1;
-        }
+        List<Repository> repositories = client.getRepositories(orgName);
 
-        GHOrganization organization;
-        try {
-            organization = client.getOrganization(orgName);
-        } catch (GHFileNotFoundException ex) {
-            log.fatal("Could not query {}. Check organization name.", orgName, ex);
-            return -1;
-        }
-
-        List<Repository> repositories = new ArrayList<>();
-        ProgressBar pb = new ProgressBar("Gather repository information", organization.getRepositories().size()).start(); // name, initial max
-
-        organization.getRepositories().values().parallelStream().forEach(r -> {
-            repositories.add(new Repository(r));
-            pb.step(); // step by 1
-        });
-
-        pb.stop(); // stops the progress bar
-
-        log.debug("Gathered {} repositories", repositories.size());
-
-        log.debug("Initializing stat factory");
         RepoStatFactory statFactory = new RepoStatFactory();
         List<IRepoStat> repoStats = new ArrayList<>();
 
@@ -93,7 +71,7 @@ public class Main implements Callable<Integer> {
 
         watch.stop();
         long result = watch.getTime(TimeUnit.SECONDS);
-        log.info("Total time for execution: {} seconds", result);
+        log.debug("Total time for execution: {} seconds", result);
 
         return status.get();
     }

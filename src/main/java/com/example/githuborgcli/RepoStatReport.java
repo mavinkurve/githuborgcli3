@@ -23,9 +23,9 @@ class RepoStatReport {
         FileWriter fileWriter = new FileWriter(outputFile.getAbsolutePath());
 
         try {
-            fileWriter.write("******* Repository Stats for " + StringUtils.capitalize(orgName) + "********\n");
+            fileWriter.write("******* Repository Stats for " + StringUtils.capitalize(orgName) + " ********\n");
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error writing {} stats to output file {}", orgName, outputFile.getName(), e);
         }
         repoStats.forEach(rs -> {
             try {
@@ -49,7 +49,7 @@ class RepoStatReport {
             fileWriter.flush();
             fileWriter.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error flushing output file {}", outputFile.getName(), e);
         }
         log.info("Repo stats can be found in file " + outputFile.getAbsolutePath());
     }

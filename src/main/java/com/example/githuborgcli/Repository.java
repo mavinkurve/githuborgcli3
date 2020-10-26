@@ -21,9 +21,11 @@ public class Repository {
         int forks = ghRepo.getForksCount();
 
         try {
-            pullRequestCount = forks > 0 ? ghRepo.getPullRequests(GHIssueState.ALL).size() : 0;
+            pullRequestCount = forks > 0 ? ghRepo.getPullRequests(GHIssueState.OPEN).size() : 0;
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Failed to fetch pull requests for {}",ghRepo.getName(),e);
+
+            pullRequestCount = 0;
         }
         contribution = (pullRequestCount > 0.0) ? pullRequestCount / forks : 0.0;
     }

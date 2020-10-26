@@ -44,4 +44,8 @@ public class PropertyManager {
     static String get(String key) {
         return properties.getProperty(key);
     }
+
+    static Integer getAsInteger(String key) {
+        return Integer.valueOf(properties.getProperty(key));
+    }
 }
