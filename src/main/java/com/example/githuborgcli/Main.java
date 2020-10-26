@@ -29,14 +29,6 @@ public class Main implements Callable<Integer> {
     @CommandLine.ArgGroup(heading = "\nProvide one of these authentication options. " +
             "Personal access token directions: https://github.blog/2013-05-16-personal-api-tokens/ \n")
     Dependent group;
-
-    static class Dependent {
-        @CommandLine.Option(names =  {"-a", "--accesstoken"}, description = "GitHub personal access token", required = true)
-        String accessToken = null;
-        @CommandLine.Option(names = {"-u", "--username"}, description = "GitHub username", required = true)
-        String username = null;
-    }
-
     @CommandLine.Option(names = {"-p", "--password"}, description = "GitHub password", arity = "0..1", interactive = true)
     private char[] password = null;
 
@@ -63,10 +55,9 @@ public class Main implements Callable<Integer> {
 
         GHOrganization organization;
         try {
-           organization = client.getOrganization(orgName);
-        }
-        catch(GHFileNotFoundException ex) {
-            log.fatal("Could not query {}. Check organization name.",orgName, ex);
+            organization = client.getOrganization(orgName);
+        } catch (GHFileNotFoundException ex) {
+            log.fatal("Could not query {}. Check organization name.", orgName, ex);
             return -1;
         }
 
@@ -92,9 +83,8 @@ public class Main implements Callable<Integer> {
         repoStats.forEach(rs -> {
             try {
                 rs.generateStats(repositories, count);
-            }
-            catch (Exception ex) {
-                log.error("Failed to generate {} stats for organization {}",rs.getName(), orgName, ex);
+            } catch (Exception ex) {
+                log.error("Failed to generate {} stats for organization {}", rs.getName(), orgName, ex);
                 status.addAndGet(1);
             }
         });
@@ -106,5 +96,12 @@ public class Main implements Callable<Integer> {
         log.info("Total time for execution: {} seconds", result);
 
         return status.get();
+    }
+
+    static class Dependent {
+        @CommandLine.Option(names = {"-a", "--accesstoken"}, description = "GitHub personal access token", required = true)
+        String accessToken = null;
+        @CommandLine.Option(names = {"-u", "--username"}, description = "GitHub username", required = true)
+        String username = null;
     }
 }

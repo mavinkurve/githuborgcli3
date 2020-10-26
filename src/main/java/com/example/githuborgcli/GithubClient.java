@@ -27,8 +27,7 @@ class GithubClient {
             log.debug("Initializing GitHub client with provided personal access token {} ", args.accessToken);
             try {
                 return new GitHubBuilder().withOAuthToken(args.accessToken).build();
-            }
-            catch (HttpException ex) {
+            } catch (HttpException ex) {
                 log.fatal("Failed to authenticate with GitHub API. Check credentials.");
                 return null;
             }
@@ -39,7 +38,7 @@ class GithubClient {
             return new GitHubBuilder().withPassword(args.username, String.valueOf(password)).build();
         }
 
-        log.fatal("Could not initialize GitHub client for access token {}, username {}, password {}",args.accessToken, args.username, password);
+        log.fatal("Could not initialize GitHub client for access token {}, username {}, password {}", args.accessToken, args.username, password);
         return null;
     }
 }

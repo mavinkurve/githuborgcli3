@@ -31,7 +31,7 @@ class RepoStatReport {
             try {
                 fileWriter.write("\t" + rs.getName() + "\n");
             } catch (IOException e) {
-                log.error("Error writing {} to output file {}",rs.getName(),outputFile.getName(),e);
+                log.error("Error writing {} to output file {}", rs.getName(), outputFile.getName(), e);
             }
             log.info(rs.getName());
             for (String name : rs.getStats()) {
@@ -40,7 +40,7 @@ class RepoStatReport {
                 try {
                     fileWriter.write(s);
                 } catch (IOException e) {
-                    log.error("Error writing {} to output file {}",s,outputFile.getName(),e);
+                    log.error("Error writing {} to output file {}", s, outputFile.getName(), e);
                 }
             }
         });
