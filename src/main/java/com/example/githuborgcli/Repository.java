@@ -23,7 +23,7 @@ public class Repository {
         try {
             pullRequestCount = forks > 0 ? ghRepo.getPullRequests(GHIssueState.OPEN).size() : 0;
         } catch (IOException e) {
-            log.error("Failed to fetch pull requests for {}",ghRepo.getName(),e);
+            log.error("Failed to fetch pull requests for {}", ghRepo.getName(), e);
 
             pullRequestCount = 0;
         }

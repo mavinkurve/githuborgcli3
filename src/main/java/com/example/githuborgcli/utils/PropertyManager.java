@@ -1,4 +1,4 @@
-package com.example.githuborgcli;
+package com.example.githuborgcli.utils;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,7 +41,7 @@ public class PropertyManager {
         return ourInstance;
     }
 
-    static String get(String key) {
+    public static String get(String key) {
         return properties.getProperty(key);
     }
 

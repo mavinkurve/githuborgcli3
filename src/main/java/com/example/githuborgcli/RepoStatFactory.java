@@ -1,9 +1,6 @@
 package com.example.githuborgcli;
 
-import com.example.githuborgcli.repostats.ContributionRepoStat;
-import com.example.githuborgcli.repostats.ForksRepoStat;
-import com.example.githuborgcli.repostats.PullRequestRepoStat;
-import com.example.githuborgcli.repostats.StarsRepoStat;
+import com.example.githuborgcli.repostats.*;
 
 class RepoStatFactory {
 

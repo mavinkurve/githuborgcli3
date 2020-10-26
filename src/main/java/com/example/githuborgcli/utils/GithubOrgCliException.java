@@ -1,10 +1,10 @@
-package com.example.githuborgcli;
+package com.example.githuborgcli.utils;
 
 
 import org.apache.logging.log4j.LogManager;
 
 class GithubOrgCliException extends Exception {
-    GithubOrgCliException (String errorMessage) {
+    GithubOrgCliException(String errorMessage) {
         super(errorMessage);
         LogManager.getLogger().fatal(errorMessage);
     }
