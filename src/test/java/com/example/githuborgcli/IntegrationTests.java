@@ -1,5 +1,6 @@
 package com.example.githuborgcli;
 
+import com.example.githuborgcli.utils.Constants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import picocli.CommandLine;
@@ -7,7 +8,7 @@ import picocli.CommandLine;
 public class IntegrationTests {
 
     // Integration test PAT
-    static String INTEG_TEST_PAT = "e023ac9abb0b939aadc5a73bd8ac390ab98a0d5a";
+    static String INTEG_TEST_PAT = System.getenv(Constants.GITHUB_ACCESS_TOKEN);
 
     static String INVALID_PAT = "abcd";
 
