@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
+import org.kohsuke.github.HttpException;
 
 import java.io.IOException;
 
@@ -11,32 +12,34 @@ class GithubClient {
 
     static Logger log = LogManager.getLogger();
 
-    static GitHub getClient(String accessToken, String username, char[] password) throws IOException {
-        if (accessToken != null) {
-            log.debug("Initializing GitHub client with provided personal access token {} ", accessToken);
-            return new GitHubBuilder().withOAuthToken(accessToken).build();
+    static GitHub getClient(Main.Dependent args, char[] password) throws IOException {
+        if (args == null) {
+            String accessTokenEnvVar = System.getenv(Constants.GITHUB_ACCESS_TOKEN);
+
+            if (accessTokenEnvVar != null) {
+                log.debug("Initializing GitHub client with personal access token {} from sys env variable", Constants.GITHUB_ACCESS_TOKEN);
+                return new GitHubBuilder().withOAuthToken(accessTokenEnvVar).build();
+            }
+            return null;
         }
 
-        if (username != null && password != null) {
-            log.debug("Initializing GitHub client with provided username {} ", username);
-            return new GitHubBuilder().withPassword(username, String.valueOf(password)).build();
+        if (args.accessToken != null) {
+            log.debug("Initializing GitHub client with provided personal access token {} ", args.accessToken);
+            try {
+                return new GitHubBuilder().withOAuthToken(args.accessToken).build();
+            }
+            catch (HttpException ex) {
+                log.fatal("Failed to authenticate with GitHub API. Check credentials.");
+                return null;
+            }
         }
 
-        String usernameProp = PropertyManager.get(Constants.USER_NAME);
-        String passwordProp = PropertyManager.get(Constants.PASSWORD);
-        String accessTokenProp = PropertyManager.get(Constants.ACCESS_TOKEN);
-
-        if (accessTokenProp != null) {
-            log.debug("Initializing GitHub client with personal access token {} in config properties", accessTokenProp);
-            return new GitHubBuilder().withOAuthToken(accessTokenProp).build();
+        if (args.username != null && password != null) {
+            log.debug("Initializing GitHub client with provided username {} ", args.username);
+            return new GitHubBuilder().withPassword(args.username, String.valueOf(password)).build();
         }
 
-        if (usernameProp != null && passwordProp != null) {
-            log.debug("Initializing GitHub client with user name {} in config properties", usernameProp);
-            return new GitHubBuilder().withPassword(usernameProp, passwordProp).build();
-        }
-
-        log.fatal("Could not initialize GitHub client for access token {}, username {}, password {}",accessToken, username, password);
+        log.fatal("Could not initialize GitHub client for access token {}, username {}, password {}",args.accessToken, args.username, password);
         return null;
     }
 }

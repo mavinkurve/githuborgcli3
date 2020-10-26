@@ -34,7 +34,6 @@ public class PropertyManager {
             }
             //load a properties file from class path, inside static method
             properties.load(input);
-
         }
     }
 

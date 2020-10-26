@@ -4,7 +4,7 @@ class Constants {
 
     static String USER_NAME = "user_name";
 
-    static String ACCESS_TOKEN = "access_token";
+    static String GITHUB_ACCESS_TOKEN = "GITHUB_ACCESS_TOKEN";
 
     static String PASSWORD = "password";
 

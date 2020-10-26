@@ -1,5 +1,6 @@
 package com.example.githuborgcli;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,7 +23,7 @@ class RepoStatReport {
         FileWriter fileWriter = new FileWriter(outputFile.getAbsolutePath());
 
         try {
-            fileWriter.write("Repository Stats for " + orgName + "\n");
+            fileWriter.write("******* Repository Stats for " + StringUtils.capitalize(orgName) + "********\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -30,7 +31,7 @@ class RepoStatReport {
             try {
                 fileWriter.write("\t" + rs.getName() + "\n");
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Error writing {} to output file {}",rs.getName(),outputFile.getName(),e);
             }
             log.info(rs.getName());
             for (String name : rs.getStats()) {
@@ -39,7 +40,7 @@ class RepoStatReport {
                 try {
                     fileWriter.write(s);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("Error writing {} to output file {}",s,outputFile.getName(),e);
                 }
             }
         });
@@ -50,7 +51,6 @@ class RepoStatReport {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        log.info("Repo stats can be found in file " + outputFile.getAbsolutePath());
     }
-
-
 }

@@ -27,7 +27,7 @@ public class StarsRepoStat implements IRepoStat {
 
     @Override
     public void generateStats(List<Repository> repositories, int count) {
-        repositories.stream().sorted(new StarCountComparator()).limit(count).forEach(r -> stats.add(r.getName()));
+            repositories.stream().sorted(new StarCountComparator()).limit(count).forEach(r -> stats.add(r.getName()));
     }
 
     public class StarCountComparator implements Comparator<Repository> {
