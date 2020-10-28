@@ -58,6 +58,7 @@ used to adjust the number of threads being spawned in parallel.
 User can adjust thread pool size to optimize for appropriate value. 
 
 *Github API Timeout* 
+
 Some organizations can have extremely large repositories that take a long time to return data. You can specify a default 
 timeout for github API data fetch using this option. 
 
