@@ -5,7 +5,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-public enum RepoStatOrder {
+public enum RepoStatType {
 
     STAR_GAZER_COUNT(Comparator.comparing(Repository::getStars, Comparator.nullsFirst(Comparator.naturalOrder())).reversed()),
     FORKS(Comparator.comparing(Repository::getForks, Comparator.nullsFirst(Comparator.naturalOrder())).reversed()),
@@ -14,7 +14,7 @@ public enum RepoStatOrder {
 
     private Comparator<Repository> cmp;
 
-    RepoStatOrder(Comparator<Repository> c) {
+    RepoStatType(Comparator<Repository> c) {
         cmp = c;
     }
 

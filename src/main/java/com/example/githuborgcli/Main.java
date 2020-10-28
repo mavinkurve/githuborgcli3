@@ -95,7 +95,7 @@ public class Main implements Callable<Integer> {
 
                 Map<String,List<String>> repoStats = new HashMap<>();
 
-                for (RepoStatOrder order : RepoStatOrder.values()) {
+                for (RepoStatType order : RepoStatType.values()) {
                     repoStats.put(order.name(), order.getTopN(repositories, count));
                 }
 
