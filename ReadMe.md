@@ -10,6 +10,7 @@ java -cp /Users/pmk/githuborgcli3/target/github-org-cli-1.0-SNAPSHOT-jar-with-de
 ```
 
 ##Authentication
+Github limits API queries to 60 per hour for unauthenticated user 
 Personal access token directions: https://github.blog/2013-05-16-personal-api-tokens
 
 ##Adding new stat 

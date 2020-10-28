@@ -6,6 +6,8 @@ import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHRepository;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Repository {
 
@@ -50,4 +52,7 @@ public class Repository {
         return ghRepository.getForksCount();
     }
 
+    public List<String> getTopN(List<Repository> list, int count) {
+        return list.stream().map(r -> r.getName()).limit(count).collect(Collectors.toList());
+    }
 }

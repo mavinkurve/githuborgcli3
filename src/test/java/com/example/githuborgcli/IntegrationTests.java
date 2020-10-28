@@ -50,4 +50,10 @@ public class IntegrationTests {
         Assertions.assertEquals(0,
                 new CommandLine(new Main()).execute("-o", ORG_NAME, "-a", INTEG_TEST_PAT, "-n", "200"));
     }
+
+    @Test
+    void testOrgName() {
+        Assertions.assertEquals(2,
+                new CommandLine(new Main()).execute());
+    }
 }

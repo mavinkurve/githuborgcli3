@@ -1,4 +1,4 @@
-package com.example.githuborgcli.utils;
+package com.example.githuborgcli;
 
 import com.example.githuborgcli.Repository;
 import me.tongfei.progressbar.ProgressBar;
@@ -29,14 +29,22 @@ public class GithubClient {
 
     int threadPoolSize;
 
-    public GithubClient(int threadPoolSize, int githubTimeout) {
+    private void setThreadpoolAndTimeout(int threadPoolSize, int githubTimeout) {
         this.threadPoolSize = threadPoolSize;
         this.githubTimeout = githubTimeout;
     }
 
+    public GithubClient(int threadPoolSize, int githubTimeout) throws IOException {
+        setThreadpoolAndTimeout(threadPoolSize,githubTimeout);
+
+        log.warn("Creating an unauthenticated github api cleint with lower rate limit");
+
+        client = new GitHubBuilder().build();
+    }
+
     public GithubClient(String accessToken, int threadPoolSize, int githubTimeout) throws IOException  {
 
-        this(threadPoolSize,githubTimeout);
+        setThreadpoolAndTimeout(threadPoolSize,githubTimeout);
 
         log.debug("Initializing GitHub client with provided personal access token {} ", accessToken);
 
@@ -45,7 +53,7 @@ public class GithubClient {
 
     public GithubClient(String userName, String password, int threadPoolSize, int githubTimeout) throws IOException  {
 
-        this(threadPoolSize,githubTimeout);
+        setThreadpoolAndTimeout(threadPoolSize,githubTimeout);
 
         log.debug("Initializing GitHub client with provided username {} ", userName);
 
@@ -65,10 +73,8 @@ public class GithubClient {
     public GHOrganization getOrganization(String orgName) {
         try {
             return client.getOrganization(orgName);
-        } catch (GHFileNotFoundException ex) {
-            log.fatal("Could not query \"{}\". Check organization name.", orgName, ex);
-        } catch (IOException e) {
-            log.fatal("Could not query \"{}\". Check organization name.", orgName, e);
+        } catch (Exception ex) {
+            log.fatal("Could not query \"{}\" organization.", orgName, ex);
         }
         return null;
     }
@@ -80,8 +86,9 @@ public class GithubClient {
         GHRateLimit rateLimit = client.getRateLimit();
         log.debug("Currently at {} remaining rate limit", rateLimit.getRemaining());
         if (ghRepositories.size() > rateLimit.getRemaining()) {
-            throw new GithubOrgCliException("The remaining GitHub API rate limit is not sufficient to process " +
-                    "repository data  for " + organization.getName() + ". Please retry later at " + rateLimit.getResetDate());
+            throw new Exception("The remaining GitHub API rate limit " + rateLimit.getRemaining() +
+                    " is not sufficient to process the " + ghRepositories.size() +
+                    " repositories  for " + organization.getName() + ". Please retry later at " + rateLimit.getResetDate());
         }
 
         List<Repository> repositories = new ArrayList<>();

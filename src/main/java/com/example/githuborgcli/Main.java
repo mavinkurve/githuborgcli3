@@ -1,16 +1,14 @@
 package com.example.githuborgcli;
 
-import com.example.githuborgcli.repostats.RepoStatType;
-import com.example.githuborgcli.utils.GithubClient;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.kohsuke.github.GHOrganization;
 import picocli.CommandLine;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -52,6 +50,7 @@ public class Main implements Callable<Integer> {
     CommandLine.Model.CommandSpec spec;
 
     public static void main(String[] args) {
+
         StopWatch watch = new StopWatch();
         watch.start();
 
@@ -62,6 +61,7 @@ public class Main implements Callable<Integer> {
         log.debug("Total time for execution: {} seconds", result);
 
         System.exit(exitCode);
+
     }
 
     private GithubClient getGithubClient() throws Exception {
@@ -75,7 +75,8 @@ public class Main implements Callable<Integer> {
             }
             return new GithubClient(username, String.valueOf(password), threadPoolSize, githubTimeout);
         }
-        throw new Exception("Could not initialize connection with GitHub");
+        else
+            return new GithubClient(threadPoolSize, githubTimeout);
     }
 
     public Integer call() throws Exception {
@@ -91,20 +92,12 @@ public class Main implements Callable<Integer> {
             List<Repository> repositories = client.getRepositories(organization);
 
             if (repositories.size() > 0) {
-                RepoStatFactory statFactory = new RepoStatFactory();
-                List<IRepoStat> repoStats = new ArrayList<>();
 
-                for (RepoStatType repoStatType : RepoStatType.values()) {
-                    repoStats.add(statFactory.getRepoStat(repoStatType));
+                Map<String,List<String>> repoStats = new HashMap<>();
+
+                for (RepoStatOrder order : RepoStatOrder.values()) {
+                    repoStats.put(order.name(), order.getTopN(repositories, count));
                 }
-                repoStats.forEach(rs -> {
-                    try {
-                        rs.generateStats(repositories, count);
-                    } catch (Exception ex) {
-                        log.error("Failed to generate {} stats for organization {}", rs.getName(), orgName, ex);
-                        status.addAndGet(1);
-                    }
-                });
 
                 RepoStatReport.generate(repoStats, orgName, resultFile);
 

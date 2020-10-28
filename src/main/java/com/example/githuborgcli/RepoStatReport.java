@@ -8,12 +8,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 class RepoStatReport {
 
     static Logger log = LogManager.getLogger();
 
-    static void generate(List<IRepoStat> repoStats, String orgName, String resultFile) throws IOException {
+    static void generate(Map<String,List<String>> stats, String orgName, String resultFile) throws IOException {
         File outputFile = new File(resultFile);
         if (outputFile.createNewFile()) {
             log.debug("Created new output file {} for logging result", outputFile.getName());
@@ -27,15 +28,15 @@ class RepoStatReport {
         } catch (IOException e) {
             log.error("Error writing {} stats to output file {}", orgName, outputFile.getName(), e);
         }
-        repoStats.forEach(rs -> {
+        for (Map.Entry entry : stats.entrySet()) {
             try {
-                fileWriter.write("\t" + rs.getName() + "\n");
+                fileWriter.write("\t" + entry.getKey() + "\n");
             } catch (IOException e) {
-                log.error("Error writing {} to output file {}", rs.getName(), outputFile.getName(), e);
+                log.error("Error writing {} to output file {}", entry.getKey(), outputFile.getName(), e);
             }
-            log.debug(rs.getName());
-            for (String stat : rs.getStats()) {
-                String s = "\t\t" + stat + "\n";
+            log.debug(entry.getKey());
+            for(String repoName : (List<String>) entry.getValue()) {
+                String s = "\t\t" + repoName + "\n";
                 log.debug(s);
                 try {
                     fileWriter.write(s);
@@ -43,7 +44,7 @@ class RepoStatReport {
                     log.error("Error writing {} to output file {}", s, outputFile.getName(), e);
                 }
             }
-        });
+        }
 
         try {
             fileWriter.flush();
