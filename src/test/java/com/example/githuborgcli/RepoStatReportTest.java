@@ -8,6 +8,6 @@ class RepoStatReportTest {
 
     @Test
     void generate() throws IOException {
-        RepoStatReport.generate(TestDataGenerator.getEmptyRepoStatsList(), "OrgName");
+        RepoStatReport.generate(TestDataGenerator.getEmptyRepoStatsList(), "OrgName", "output.log");
     }
 }

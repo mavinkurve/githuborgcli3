@@ -34,7 +34,9 @@ public class StarsRepoStat implements IRepoStat {
 
         @Override
         public int compare(Repository o1, Repository o2) {
-            return Double.compare(o2.getStars(), o1.getStars());
+            if (o1 != null && o2 != null)
+                return Integer.compare(o2.getStars(), o1.getStars());
+            return 0;
         }
     }
 }

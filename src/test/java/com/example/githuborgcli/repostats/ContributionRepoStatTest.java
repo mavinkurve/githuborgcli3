@@ -1,24 +1,21 @@
 package com.example.githuborgcli.repostats;
 
+import org.junit.jupiter.api.Test;
+
 class ContributionRepoStatTest {
 
-    @org.junit.jupiter.api.BeforeEach
-    void setUp() {
-    }
+    ContributionRepoStat repoStat = new ContributionRepoStat();
 
-    @org.junit.jupiter.api.AfterEach
-    void tearDown() {
-    }
-
-    @org.junit.jupiter.api.Test
+    @Test
     void getName() {
+
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void getStats() {
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void generateStats() {
     }
 }

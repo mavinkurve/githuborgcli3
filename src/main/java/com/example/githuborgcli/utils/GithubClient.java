@@ -20,9 +20,18 @@ public class GithubClient {
 
     static int PAGE_SIZE = 100;
 
+    static String GITHUB_ACCESS_TOKEN = "GITHUB_ACCESS_TOKEN";
+
     GitHub client;
 
-    public GithubClient(AuthArgs args, char[] password) throws IOException {
+    int githubTimeout;
+
+    int threadPoolSize;
+
+    public GithubClient(AuthArgs args, char[] password, int threadPoolSize, int githubTimeout) throws IOException {
+        this.threadPoolSize = threadPoolSize;
+        this.githubTimeout = githubTimeout;
+
         if (args != null) {
             if (args.accessToken != null) {
                 log.debug("Initializing GitHub client with provided personal access token {} ", args.accessToken);
@@ -42,10 +51,11 @@ public class GithubClient {
             }
         }
 
-        String accessTokenEnvVar = System.getenv(Constants.GITHUB_ACCESS_TOKEN);
+        String accessTokenEnvVar = System.getenv(GITHUB_ACCESS_TOKEN);
 
         if (accessTokenEnvVar != null) {
-            log.debug("Initializing GitHub client with personal access token {} from sys env variable", Constants.GITHUB_ACCESS_TOKEN);
+            log.debug("Initializing GitHub client with personal access token {} from sys env variable",
+                    GITHUB_ACCESS_TOKEN);
             client = new GitHubBuilder().withOAuthToken(accessTokenEnvVar).build();
             return;
         }
@@ -65,38 +75,43 @@ public class GithubClient {
         return ghRepositories;
     }
 
-    public List<Repository> getRepositories(String orgName) throws Exception {
-        GHOrganization organization;
+    public GHOrganization getOrganization(String orgName) {
         try {
-            organization = client.getOrganization(orgName);
+            return client.getOrganization(orgName);
         } catch (GHFileNotFoundException ex) {
-            log.fatal("Could not query {}. Check organization name.", orgName, ex);
-            return null;
+            log.fatal("Could not query \"{}\". Check organization name.", orgName, ex);
+        } catch (IOException e) {
+            log.fatal("Could not query \"{}\". Check organization name.", orgName, e);
         }
+        return null;
+    }
 
+    public List<Repository> getRepositories(GHOrganization organization) throws Exception {
+        log.info("Gathering data for \"{}\" organization", organization.getName());
         List<GHRepository> ghRepositories = listRepositories(organization);
 
         GHRateLimit rateLimit = client.getRateLimit();
         log.debug("Currently at {} remaining rate limit", rateLimit.getRemaining());
         if (ghRepositories.size() > rateLimit.getRemaining()) {
             throw new GithubOrgCliException("The remaining GitHub API rate limit is not sufficient to process " +
-                    "repository data  for " + orgName + ". Please retry later at " + rateLimit.getResetDate());
+                    "repository data  for " + organization.getName() + ". Please retry later at " + rateLimit.getResetDate());
         }
 
         List<Repository> repositories = new ArrayList<>();
-        ProgressBar repoStatProgress = new ProgressBar("Gathering repository stats", ghRepositories.size()).start();
-        ExecutorService executor = Executors.newFixedThreadPool(PropertyManager.getAsInteger(Constants.THREAD_POOL_SIZE));
-        List<Callable<Boolean>> tasks = new ArrayList<>();
+        ProgressBar repoStatProgress = new ProgressBar(String.format("Gathering stats for %s's %d repositories",
+                organization.getName(), ghRepositories.size()), ghRepositories.size()).start();
+        ExecutorService executor = Executors.newFixedThreadPool(threadPoolSize);
+        List<Callable<Void>> tasks = new ArrayList<>();
         for (final GHRepository ghRepository : ghRepositories) {
-            Callable<Boolean> c = () -> {
-                boolean b = repositories.add(new Repository(ghRepository));
+            Callable<Void> c = () -> {
+                repositories.add(new Repository(ghRepository));
                 repoStatProgress.step();
-                return b;
+                return null;
             };
             tasks.add(c);
         }
 
-        executor.invokeAll(tasks, PropertyManager.getAsInteger(Constants.GITHUB_API_TIMEOUT), TimeUnit.SECONDS);
+        executor.invokeAll(tasks, githubTimeout, TimeUnit.SECONDS);
         repoStatProgress.stop();
 
         return repositories;

@@ -1,17 +1,16 @@
 package com.example.githuborgcli;
 
-import com.example.githuborgcli.utils.Constants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import picocli.CommandLine;
 
 public class IntegrationTests {
 
     // Integration test PAT
-    static String INTEG_TEST_PAT = System.getenv(Constants.GITHUB_ACCESS_TOKEN);
+    static String INTEG_TEST_PAT = System.getenv("GITHUB_ACCESS_TOKEN");
 
     static String INVALID_PAT = "abcd";
-
 
     // Integration test org
     static String ORG_NAME = "psm-test";
@@ -20,6 +19,7 @@ public class IntegrationTests {
     static String INVALID_ORG_NAME = "1968177137";
 
     @Test
+    @EnabledIfEnvironmentVariable(named = "GITHUB_ACCESS_TOKEN", matches = "^(?!\\s*$).+")
     void testHappyPath() {
         Assertions.assertEquals(0,
                 new CommandLine(new Main()).execute("-a", INTEG_TEST_PAT, "-o", ORG_NAME));
@@ -44,7 +44,9 @@ public class IntegrationTests {
     }
 
     @Test
+    @EnabledIfEnvironmentVariable(named = "GITHUB_ACCESS_TOKEN", matches = "^(?!\\s*$).+")
     void testLimitCount() {
+        assert (INTEG_TEST_PAT != null);
         Assertions.assertEquals(0,
                 new CommandLine(new Main()).execute("-o", ORG_NAME, "-a", INTEG_TEST_PAT, "-n", "200"));
     }

@@ -6,6 +6,7 @@ import com.example.githuborgcli.utils.GithubClient;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.kohsuke.github.GHOrganization;
 import picocli.CommandLine;
 
 import java.util.ArrayList;
@@ -28,6 +29,15 @@ public class Main implements Callable<Integer> {
     @CommandLine.ArgGroup(heading = "\nProvide one of these authentication options.\n")
     AuthArgs group;
 
+    @CommandLine.Option(names = {"-r", "--resultFile"}, description = "File to print results in")
+    String resultFile = "logs/output.log";
+
+    @CommandLine.Option(names = {"-t", "--threadPoolSize"}, description = "Thread pool size")
+    int threadPoolSize = 25;
+
+    @CommandLine.Option(names = {"-g", "--githubTimeout"}, description = "Github API timeout in seconds")
+    int githubTimeout = 100;
+
     @CommandLine.Option(names = {"-p", "--password"}, description = "GitHub password", arity = "0..1", interactive = true)
     private char[] password = null;
 
@@ -49,28 +59,37 @@ public class Main implements Callable<Integer> {
 
         log.info("Getting stats on " + this.orgName + " for n: " + count);
 
-        GithubClient client = new GithubClient(group, password);
+        GithubClient client = new GithubClient(group, password, threadPoolSize, githubTimeout);
 
-        List<Repository> repositories = client.getRepositories(orgName);
+        GHOrganization organization = client.getOrganization(orgName);
 
-        RepoStatFactory statFactory = new RepoStatFactory();
-        List<IRepoStat> repoStats = new ArrayList<>();
+        if (organization != null) {
+            List<Repository> repositories = client.getRepositories(organization);
 
-        for (RepoStatType repoStatType : RepoStatType.values()) {
-            repoStats.add(statFactory.getRepoStat(repoStatType));
-        }
-        repoStats.forEach(rs -> {
-            try {
-                rs.generateStats(repositories, count);
-            } catch (Exception ex) {
-                log.error("Failed to generate {} stats for organization {}", rs.getName(), orgName, ex);
-                status.addAndGet(1);
-            }
-        });
+            if (repositories.size() > 0) {
+                RepoStatFactory statFactory = new RepoStatFactory();
+                List<IRepoStat> repoStats = new ArrayList<>();
 
-        RepoStatReport.generate(repoStats, orgName);
+                for (RepoStatType repoStatType : RepoStatType.values()) {
+                    repoStats.add(statFactory.getRepoStat(repoStatType));
+                }
+                repoStats.forEach(rs -> {
+                    try {
+                        rs.generateStats(repositories, count);
+                    } catch (Exception ex) {
+                        log.error("Failed to generate {} stats for organization {}", rs.getName(), orgName, ex);
+                        status.addAndGet(1);
+                    }
+                });
+
+                RepoStatReport.generate(repoStats, orgName, resultFile);
+
+                return status.get();
+            } else
+                status.getAndSet(-1);
+        } else
+            status.getAndSet(-1);
 
         return status.get();
     }
-
 }

@@ -30,8 +30,8 @@ public class Repository {
         contribution = (pullRequestCount > 0.0) ? pullRequestCount / forks : 0.0;
     }
 
-    public Double getStars() {
-        return (double) ghRepository.getStargazersCount();
+    public Integer getStars() {
+        return ghRepository.getStargazersCount();
     }
 
     public int getPullRequestCount() {

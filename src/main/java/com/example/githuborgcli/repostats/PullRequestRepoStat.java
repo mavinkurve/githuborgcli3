@@ -34,7 +34,9 @@ public class PullRequestRepoStat implements IRepoStat {
 
         @Override
         public int compare(Repository o1, Repository o2) {
-            return Double.compare(o2.getPullRequestCount(), o1.getPullRequestCount());
+            if (o1 != null && o2 != null)
+                return Double.compare(o2.getPullRequestCount(), o1.getPullRequestCount());
+            return 0;
         }
     }
 }

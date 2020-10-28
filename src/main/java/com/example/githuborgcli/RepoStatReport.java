@@ -1,7 +1,5 @@
 package com.example.githuborgcli;
 
-import com.example.githuborgcli.utils.Constants;
-import com.example.githuborgcli.utils.PropertyManager;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,8 +13,8 @@ class RepoStatReport {
 
     static Logger log = LogManager.getLogger();
 
-    static void generate(List<IRepoStat> repoStats, String orgName) throws IOException {
-        File outputFile = new File(PropertyManager.get(Constants.OUTPUT_FILE));
+    static void generate(List<IRepoStat> repoStats, String orgName, String resultFile) throws IOException {
+        File outputFile = new File(resultFile);
         if (outputFile.createNewFile()) {
             log.debug("Created new output file {} for logging result", outputFile.getName());
         } else
@@ -35,10 +33,10 @@ class RepoStatReport {
             } catch (IOException e) {
                 log.error("Error writing {} to output file {}", rs.getName(), outputFile.getName(), e);
             }
-            log.info(rs.getName());
-            for (String name : rs.getStats()) {
-                String s = "\t\t" + name + "\n";
-                log.info(s);
+            log.debug(rs.getName());
+            for (String stat : rs.getStats()) {
+                String s = "\t\t" + stat + "\n";
+                log.debug(s);
                 try {
                     fileWriter.write(s);
                 } catch (IOException e) {
