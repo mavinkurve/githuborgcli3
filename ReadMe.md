@@ -69,11 +69,11 @@ The app can be extended to report a new stat for repositories by specifying the 
 a list of repositories in RepoStatType.java as follows. Adding a new enum in this file will automatically add the stat 
 to the generated report. 
 ```$java
-STAR_GAZER_COUNT(Comparator.comparing(Repository::getStars, Comparator.nullsFirst(Comparator.naturalOrder())).reversed()),
+STAR_GAZER_COUNT(Comparator.comparing(Repository::getStars, Comparator.nullsLast(Comparator.naturalOrder())).reversed()),
 ```
 
 ## Preemptive Rate Limiting
-Github limits API queries to 60 per hour for unauthenticated user and 5000 per hour for authenticated user. To avoid 
+Github limits API queries to 60 requests per hour for unauthenticated user and 5000 requests per hour for authenticated user. To avoid 
 running into this limit, app will check the remaining rate limit for user before performing any API call intensive 
 operations. It will preemptively exit if such an operation cannot be completed and will provide the rate limit reset time.  
 
