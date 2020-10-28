@@ -66,8 +66,10 @@ public class Main implements Callable<Integer> {
 
     private GithubClient getGithubClient() throws Exception {
         if (accessToken != null) {
+            log.info("Initializing github connection using access token {} ", accessToken);
             return new GithubClient(accessToken, threadPoolSize, githubTimeout);
         } else if (accessTokenSysEnv != null) {
+            log.info("Initializing github connection using access token {} ", accessTokenSysEnv);
             return new GithubClient(System.getenv(accessTokenSysEnv), threadPoolSize, githubTimeout);
         } else if (username != null) {
             if (password == null) {

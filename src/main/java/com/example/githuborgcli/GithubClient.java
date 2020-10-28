@@ -10,6 +10,7 @@ import javax.xml.ws.http.HTTPException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -44,6 +45,8 @@ public class GithubClient {
 
     public GithubClient(String accessToken, int threadPoolSize, int githubTimeout) throws IOException  {
 
+        Objects.requireNonNull(accessToken, "Access token is null");
+
         setThreadpoolAndTimeout(threadPoolSize,githubTimeout);
 
         log.debug("Initializing GitHub client with provided personal access token {} ", accessToken);
@@ -61,16 +64,18 @@ public class GithubClient {
     }
 
     private List<GHRepository> listRepositories(GHOrganization organization) throws IOException {
+        List<GHRepository> ghRepositories = new ArrayList<>();
+
         log.debug("Getting {} repositories", organization.getName());
         PagedIterator repositoryPagedIterator = organization.listRepositories(PAGE_SIZE).iterator();
-        List<GHRepository> ghRepositories = new ArrayList<>();
+        
         repositoryPagedIterator.forEachRemaining
                 (r -> ghRepositories.add((GHRepository) r));
         log.debug("Resolved {} repositories", ghRepositories.size());
         return ghRepositories;
     }
 
-    public GHOrganization getOrganization(String orgName) {
+    GHOrganization getOrganization(String orgName) {
         try {
             return client.getOrganization(orgName);
         } catch (Exception ex) {
@@ -79,7 +84,7 @@ public class GithubClient {
         return null;
     }
 
-    public List<Repository> getRepositories(GHOrganization organization) throws Exception {
+    List<Repository> getRepositories(GHOrganization organization) throws Exception {
         log.info("Gathering data for \"{}\" organization", organization.getName());
         List<GHRepository> ghRepositories = listRepositories(organization);
 

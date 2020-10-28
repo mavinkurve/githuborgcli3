@@ -40,14 +40,16 @@ gets repo popularity stats for a github org
 ```
 
 ## Authentication
-This app can run in authenticated or unauthenticated mode. When running unauthenticated, API rate limit will be 
-restricted to 60 per hour. 
+This app can run in authenticated or unauthenticated mode. 
+
 Authentication can be provided via personal access token specified on commandline or provided via a system environment 
 variable. 
 Personal access token directions: https://github.blog/2013-05-16-personal-api-tokens
 
 Alternately, you can also specify username and password on commandline. If you are providing `-u` option, specify `-p` 
 flag on commandline to enter password in interactive mode.   
+
+App will default to using unauthenticated mode when above options fail. 
 
 ## Other commandline options
 
