@@ -22,25 +22,25 @@ public class IntegrationTests {
     @EnabledIfEnvironmentVariable(named = "GITHUB_ACCESS_TOKEN", matches = "^(?!\\s*$).+")
     void testHappyPath() {
         Assertions.assertEquals(0,
-                new CommandLine(new Main()).execute("-a", INTEG_TEST_PAT, "-o", ORG_NAME));
+                new CommandLine(new Main()).execute("--accessToken", INTEG_TEST_PAT, "-o", ORG_NAME));
     }
 
     @Test
     void testInvalidAuth() {
         Assertions.assertNotEquals(0,
-                new CommandLine(new Main()).execute("-o", ORG_NAME, "-a", INVALID_PAT));
+                new CommandLine(new Main()).execute("-o", ORG_NAME, "--accessToken", INVALID_PAT));
     }
 
     @Test
     void testNonExistingOrg() {
         Assertions.assertNotEquals(0,
-                new CommandLine(new Main()).execute("-o", INVALID_ORG_NAME, "-a", INTEG_TEST_PAT));
+                new CommandLine(new Main()).execute("-o", INVALID_ORG_NAME, "--accessToken", INTEG_TEST_PAT));
     }
 
     @Test
     void testNegativeLimitCount() {
         Assertions.assertTrue(
-                new CommandLine(new Main()).execute("-o", ORG_NAME, "-a", INTEG_TEST_PAT, "-n", "-2") > 0);
+                new CommandLine(new Main()).execute("-o", ORG_NAME, "--accessToken", INTEG_TEST_PAT, "-n", "-2") > 0);
     }
 
     @Test
@@ -48,7 +48,7 @@ public class IntegrationTests {
     void testLimitCount() {
         assert (INTEG_TEST_PAT != null);
         Assertions.assertEquals(0,
-                new CommandLine(new Main()).execute("-o", ORG_NAME, "-a", INTEG_TEST_PAT, "-n", "200"));
+                new CommandLine(new Main()).execute("-o", ORG_NAME, "--accessToken", INTEG_TEST_PAT, "-n", "200"));
     }
 
     @Test
