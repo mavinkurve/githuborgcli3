@@ -12,7 +12,7 @@ Package: https://github.com/mavinkurve/githuborgcli3/packages/477432
 
 ## Usage
 ```$shell
-Usage: getRepoStats [-hV] [-p]... [--accessToken=<accessToken>] [--accessToken:
+Usage: <main class> [-hV] [-p]... [--accessToken=<accessToken>] [--accessToken:
                     env=<accessTokenSysEnv>] [-g=<githubTimeout>] [-n=<count>]
                     -o=<orgName> [-r=<resultFile>] [-t=<threadPoolSize>]
                     [-u=<username>]

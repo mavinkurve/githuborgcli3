@@ -13,7 +13,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@CommandLine.Command(name = "getRepoStats", mixinStandardHelpOptions = true, version = "version 1.0",
+@CommandLine.Command(mixinStandardHelpOptions = true, version = "version 1.0",
         description = "gets repo popularity stats for a github org")
 public class Main implements Callable<Integer> {
     static Logger log = LogManager.getLogger();
