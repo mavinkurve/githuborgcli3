@@ -68,7 +68,7 @@ public class GithubClient {
 
         log.debug("Getting {} repositories", organization.getName());
         PagedIterator repositoryPagedIterator = organization.listRepositories(PAGE_SIZE).iterator();
-        
+
         repositoryPagedIterator.forEachRemaining
                 (r -> ghRepositories.add((GHRepository) r));
         log.debug("Resolved {} repositories", ghRepositories.size());
