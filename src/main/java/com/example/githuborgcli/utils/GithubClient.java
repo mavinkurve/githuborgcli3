@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.kohsuke.github.*;
 
+import javax.xml.ws.http.HTTPException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,41 +29,27 @@ public class GithubClient {
 
     int threadPoolSize;
 
-    public GithubClient(AuthArgs args, char[] password, int threadPoolSize, int githubTimeout) throws IOException {
+    public GithubClient(int threadPoolSize, int githubTimeout) {
         this.threadPoolSize = threadPoolSize;
         this.githubTimeout = githubTimeout;
+    }
 
-        if (args != null) {
-            if (args.accessToken != null) {
-                log.debug("Initializing GitHub client with provided personal access token {} ", args.accessToken);
-                try {
-                    client = new GitHubBuilder().withOAuthToken(args.accessToken).build();
-                    return;
-                } catch (HttpException ex) {
-                    log.fatal("Failed to authenticate with GitHub API. Check credentials.", ex);
-                    return;
-                }
-            }
+    public GithubClient(String accessToken, int threadPoolSize, int githubTimeout) throws IOException  {
 
-            if (args.username != null && password != null) {
-                log.debug("Initializing GitHub client with provided username {} ", args.username);
-                client = new GitHubBuilder().withPassword(args.username, String.valueOf(password)).build();
-                return;
-            }
-        }
+        this(threadPoolSize,githubTimeout);
 
-        String accessTokenEnvVar = System.getenv(GITHUB_ACCESS_TOKEN);
+        log.debug("Initializing GitHub client with provided personal access token {} ", accessToken);
 
-        if (accessTokenEnvVar != null) {
-            log.debug("Initializing GitHub client with personal access token {} from sys env variable",
-                    GITHUB_ACCESS_TOKEN);
-            client = new GitHubBuilder().withOAuthToken(accessTokenEnvVar).build();
-            return;
-        }
+        client = new GitHubBuilder().withOAuthToken(accessToken).build();
+    }
 
-        log.warn("GENERATING UNAUTHENTICATED GITHUB CLIENT WITH LOWER RATE LIMIT");
-        client = new GitHubBuilder().build();
-        return;
+    public GithubClient(String userName, String password, int threadPoolSize, int githubTimeout) throws IOException  {
+
+        this(threadPoolSize,githubTimeout);
+
+        log.debug("Initializing GitHub client with provided username {} ", userName);
+
+        client = new GitHubBuilder().withPassword(userName,password).build();
     }
 
     private List<GHRepository> listRepositories(GHOrganization organization) throws IOException {
